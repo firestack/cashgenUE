@@ -75,7 +75,7 @@ void AWorldManager::Tick(float DeltaTime )
 
 		if (MyRegenQueue.Num() <= 0)
 		{
-			currentPlayerPawn->GetCharacterMovement()->GravityScale = 1.0f;
+			//currentPlayerPawn->GetCharacterMovement()->GravityScale = 1.0f;
 		}
 
 		// Sweep the zones for LOD changes
@@ -213,7 +213,7 @@ uint8 AWorldManager::GetLODForOffset(const Point aOffset)
 	return 0;
 }
 
-void AWorldManager::SpawnZones(ACharacter* aPlayerPawn, const FZoneConfig aZoneConfig, const int32 aNumXZones, const int32 aNumYZones, const int32 aMaxThreads, const uint8 aRenderTokens)
+void AWorldManager::SpawnZones(const FZoneConfig aZoneConfig, const int32 aNumXZones, const int32 aNumYZones, const int32 aMaxThreads, const uint8 aRenderTokens)
 {
 	world = GetWorld();
 	MyZoneConfigMaster = aZoneConfig;
@@ -222,8 +222,10 @@ void AWorldManager::SpawnZones(ACharacter* aPlayerPawn, const FZoneConfig aZoneC
 	MyMaxThreads = aMaxThreads;
 	RenderTokens = aRenderTokens;
 
-	currentPlayerPawn = aPlayerPawn;
-	currentPlayerPawn->GetCharacterMovement()->GravityScale = 0.0f;
+
+	currentPlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+
+
 
 	for (int i = 0; i < MyMaxThreads; ++i)
 	{
@@ -232,7 +234,7 @@ void AWorldManager::SpawnZones(ACharacter* aPlayerPawn, const FZoneConfig aZoneC
 
 	currentPlayerPawn->SetActorLocation(FVector((MyNumXZones/ 2.0f) * MyZoneConfigMaster.XUnits * MyZoneConfigMaster.UnitSize, (MyNumYZones / 2.0f) * MyZoneConfigMaster.YUnits * MyZoneConfigMaster.UnitSize, 40000.0f));
 
-	if (currentPlayerPawn)
+	if (IsValid(currentPlayerPawn))
 	{
 		currentPlayerZone.X = floor(currentPlayerPawn->GetActorLocation().X / (MyZoneConfigMaster.UnitSize * MyZoneConfigMaster.XUnits));
 		currentPlayerZone.Y = floor(currentPlayerPawn->GetActorLocation().Y / (MyZoneConfigMaster.UnitSize * MyZoneConfigMaster.YUnits));
